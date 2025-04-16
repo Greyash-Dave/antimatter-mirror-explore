@@ -2,52 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import custom fonts */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono&display=swap');
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Theme updated to use dark mode by default for antimatter theme */
+    --background: 224 84% 6%; /* #080c14 Background */
+    --foreground: 0 0% 100%; /* #ffffff Text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 224 84% 6%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 224 84% 6%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 218 47% 19%; /* #1a2b47 Matter Blue */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 353 41% 32%; /* #722f37 Antimatter Red */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 5% 20%;
+    --muted-foreground: 0 0% 88%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 42 94% 56%; /* #f9d423 Energy Yellow */
+    --accent-foreground: 0 0% 12%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 222 10% 20%;
+    --input: 222 10% 20%;
+    --ring: 43 96% 56%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -92,10 +89,80 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border scroll-smooth;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-antimatter-bg text-antimatter-text font-inter overflow-x-hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-exo font-semibold;
+  }
+  
+  code, pre, .monospace {
+    @apply font-space;
+  }
+}
+
+@layer components {
+  .section {
+    @apply min-h-screen w-full py-16 px-4 md:px-8 lg:px-16 relative overflow-hidden;
+  }
+  
+  .floating {
+    @apply animate-float;
+  }
+  
+  .glowing {
+    @apply animate-pulse-glow;
+  }
+  
+  .particle {
+    @apply absolute rounded-full bg-opacity-70 animate-particle-drift;
+  }
+  
+  .btn-primary {
+    @apply bg-antimatter-blue text-white px-6 py-3 rounded-md hover:bg-opacity-90 transition-all 
+           font-semibold relative overflow-hidden shadow-md hover:shadow-lg;
+  }
+  
+  .btn-secondary {
+    @apply bg-antimatter-red text-white px-6 py-3 rounded-md hover:bg-opacity-90 transition-all
+           font-semibold relative overflow-hidden shadow-md hover:shadow-lg;
+  }
+  
+  .btn-accent {
+    @apply bg-antimatter-yellow text-antimatter-bg px-6 py-3 rounded-md hover:bg-opacity-90 transition-all
+           font-semibold relative overflow-hidden shadow-md hover:shadow-lg;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-lg;
+  }
+  
+  .split-screen {
+    @apply flex flex-col md:flex-row w-full;
+  }
+  
+  .split-left {
+    @apply w-full md:w-1/2 p-4 animate-split-appear-left;
+  }
+  
+  .split-right {
+    @apply w-full md:w-1/2 p-4 animate-split-appear-right;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-antimatter-bg;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-antimatter-blue bg-opacity-70 rounded-full hover:bg-antimatter-red transition-colors duration-300;
   }
 }
