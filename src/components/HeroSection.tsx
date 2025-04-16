@@ -1,13 +1,12 @@
-
 import { ArrowDown } from 'lucide-react';
 import ParticleCanvas from './ParticleCanvas';
+import { handleSmoothScrollLinkClick, scrollToNextSection } from '@/lib/scroll-utils';
+import AnimatedSection, { AnimateOnScroll } from './AnimatedSection';
+import { motion } from 'framer-motion';
 
 export default function HeroSection() {
-  const scrollToNextSection = () => {
-    const mirrorSection = document.getElementById('mirror');
-    if (mirrorSection) {
-      mirrorSection.scrollIntoView({ behavior: 'smooth' });
-    }
+  const handleNextSectionClick = () => {
+    scrollToNextSection('hero');
   };
 
   return (
@@ -23,34 +22,72 @@ export default function HeroSection() {
       </div>
       
       {/* Content */}
-      <div className="z-10 text-center max-w-4xl px-4 animate-fade-in-up">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4">
-          <span className="text-antimatter-blue">Antimatter:</span>
-          <br />
-          <span className="text-antimatter-red">The Mirror of Our Universe</span>
-        </h1>
+      <div className="z-10 text-center max-w-4xl px-4">
+        <AnimateOnScroll variant="fadeIn" duration={1.2}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4">
+            <motion.span 
+              className="text-antimatter-blue inline-block"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              Antimatter:
+            </motion.span>
+            <br />
+            <motion.span 
+              className="text-antimatter-red inline-block"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              The Mirror of Our Universe
+            </motion.span>
+          </h1>
+        </AnimateOnScroll>
         
-        <p className="text-lg sm:text-xl md:text-2xl mb-8 text-antimatter-textDim">
-          Explore the fascinating world where particles meet their opposite twins
-        </p>
+        <AnimateOnScroll delay={0.4} duration={0.8}>
+          <p className="text-lg sm:text-xl md:text-2xl mb-8 text-antimatter-textDim">
+            Explore the fascinating world where particles meet their opposite twins
+          </p>
+        </AnimateOnScroll>
         
-        <div className="space-x-4">
-          <button onClick={scrollToNextSection} className="btn-primary">
-            Begin Exploration
-          </button>
-          
-          <a href="#learn" className="btn-secondary">
-            Learn More
-          </a>
-        </div>
+        <AnimateOnScroll delay={0.8} variant="zoomIn" duration={0.6}>
+          <div className="space-x-4">
+            <button onClick={handleNextSectionClick} className="btn-primary">
+              Begin Exploration
+            </button>
+            
+            <a 
+              href="#learn" 
+              className="btn-secondary"
+              onClick={(e) => handleSmoothScrollLinkClick(e, 'learn')}
+            >
+              Learn More
+            </a>
+          </div>
+        </AnimateOnScroll>
       </div>
       
       {/* Scroll indicator */}
-      <div className="absolute bottom-10 left-0 right-0 flex justify-center animate-bounce">
-        <button onClick={scrollToNextSection} className="text-antimatter-textDim hover:text-antimatter-text transition-colors">
+      <motion.div 
+        className="absolute bottom-10 left-0 right-0 flex justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 1 }}
+      >
+        <motion.button 
+          onClick={handleNextSectionClick} 
+          className="text-antimatter-textDim hover:text-antimatter-text transition-colors"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ 
+            duration: 2, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
+        >
           <ArrowDown size={32} />
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
     </section>
   );
 }

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { 
   Heart, 
@@ -9,6 +8,9 @@ import {
   ChevronLeft, 
   ChevronRight 
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import AnimatedSection, { AnimateOnScroll } from './AnimatedSection';
+import StaggeredAnimation from './StaggeredAnimation';
 
 interface Application {
   id: string;
@@ -68,84 +70,149 @@ export default function ApplicationsSection() {
   return (
     <section id="uses" className="section bg-gradient-to-b from-antimatter-bg to-antimatter-bg/90">
       <div className="container mx-auto flex flex-col h-full">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-center">
-          Applications of <span className="text-antimatter-yellow">Antimatter</span>
-        </h2>
+        <AnimateOnScroll>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-center">
+            Applications of <span className="text-antimatter-yellow">Antimatter</span>
+          </h2>
+        </AnimateOnScroll>
         
-        <p className="text-center max-w-3xl mx-auto mb-12 text-lg text-antimatter-textDim">
-          From medical diagnostics to the future of space travel, antimatter has 
-          both current and potential applications that could transform our world.
-        </p>
+        <AnimateOnScroll delay={0.2}>
+          <p className="text-center max-w-3xl mx-auto mb-12 text-lg text-antimatter-textDim">
+            From medical diagnostics to the future of space travel, antimatter has 
+            both current and potential applications that could transform our world.
+          </p>
+        </AnimateOnScroll>
         
         {/* Application carousel */}
         <div className="flex-1 flex flex-col items-center">
           {/* Navigation dots */}
-          <div className="flex justify-center mb-8 gap-2">
-            {applications.map((app, index) => (
-              <button
-                key={app.id}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  index === activeIndex 
-                    ? `${applications[activeIndex].color} transform scale-125` 
-                    : 'bg-antimatter-gray opacity-50'
-                }`}
-                onClick={() => setActiveIndex(index)}
-                aria-label={`View ${app.name}`}
-              />
-            ))}
-          </div>
+          <AnimateOnScroll delay={0.4} className="w-full">
+            <StaggeredAnimation 
+              className="flex justify-center mb-8 gap-2"
+              staggerDelay={0.05} 
+              direction="up"
+            >
+              {applications.map((app, index) => (
+                <motion.button
+                  key={app.id}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    index === activeIndex 
+                      ? `${applications[activeIndex].color} transform scale-125` 
+                      : 'bg-antimatter-gray opacity-50'
+                  }`}
+                  onClick={() => setActiveIndex(index)}
+                  aria-label={`View ${app.name}`}
+                  whileHover={{ scale: 1.5 }}
+                  whileTap={{ scale: 0.9 }}
+                />
+              ))}
+            </StaggeredAnimation>
+          </AnimateOnScroll>
           
           {/* Application card */}
-          <div className="w-full max-w-4xl bg-black bg-opacity-50 rounded-xl overflow-hidden shadow-xl">
-            <div className={`${applications[activeIndex].color} p-6 flex items-center justify-between`}>
-              <div className="text-antimatter-bg">
-                {applications[activeIndex].icon}
-              </div>
+          <AnimateOnScroll delay={0.6} className="w-full max-w-4xl">
+            <motion.div 
+              className="bg-black bg-opacity-50 rounded-xl overflow-hidden shadow-xl"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={`app-header-${activeIndex}`}
+                  className={`${applications[activeIndex].color} p-6 flex items-center justify-between`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <motion.div 
+                    className="text-antimatter-bg"
+                    initial={{ rotate: -10, scale: 0.9 }}
+                    animate={{ rotate: 0, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {applications[activeIndex].icon}
+                  </motion.div>
+                  
+                  <motion.h3 
+                    className="text-2xl font-bold text-antimatter-bg"
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                  >
+                    {applications[activeIndex].name}
+                  </motion.h3>
+                  
+                  <RotateCw size={24} className="text-antimatter-bg animate-spin opacity-20" />
+                </motion.div>
+              </AnimatePresence>
               
-              <h3 className="text-2xl font-bold text-antimatter-bg">
-                {applications[activeIndex].name}
-              </h3>
-              
-              <RotateCw size={24} className="text-antimatter-bg animate-spin opacity-20" />
-            </div>
-            
-            <div className="p-8 flex flex-col md:flex-row gap-8">
-              <div className="flex-1">
-                <h4 className="text-xl font-bold mb-4">Overview</h4>
-                <p className="text-antimatter-textDim mb-4">
-                  {applications[activeIndex].description}
-                </p>
+              <div className="p-8 flex flex-col md:flex-row gap-8">
+                <AnimatePresence mode="wait">
+                  <motion.div 
+                    key={`app-content-${activeIndex}`}
+                    className="flex-1"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h4 className="text-xl font-bold mb-4">Overview</h4>
+                    <p className="text-antimatter-textDim mb-4">
+                      {applications[activeIndex].description}
+                    </p>
+                    
+                    <h4 className="text-xl font-bold mb-4">Details</h4>
+                    <p className="text-antimatter-textDim">
+                      {applications[activeIndex].details}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
                 
-                <h4 className="text-xl font-bold mb-4">Details</h4>
-                <p className="text-antimatter-textDim">
-                  {applications[activeIndex].details}
-                </p>
+                <AnimatePresence mode="wait">
+                  <motion.div 
+                    key={`app-icon-${activeIndex}`}
+                    className="w-full md:w-1/3 flex items-center justify-center"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    transition={{ 
+                      duration: 0.5,
+                      type: "spring",
+                      stiffness: 100
+                    }}
+                  >
+                    <div className={`w-48 h-48 rounded-full ${applications[activeIndex].color} bg-opacity-30 flex items-center justify-center animate-pulse-glow`}>
+                      {applications[activeIndex].icon}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              
-              <div className="w-full md:w-1/3 flex items-center justify-center">
-                <div className={`w-48 h-48 rounded-full ${applications[activeIndex].color} bg-opacity-30 flex items-center justify-center animate-pulse-glow`}>
-                  {applications[activeIndex].icon}
-                </div>
-              </div>
-            </div>
-          </div>
+            </motion.div>
+          </AnimateOnScroll>
           
           {/* Navigation buttons */}
-          <div className="flex justify-center gap-4 mt-8">
-            <button 
+          <AnimateOnScroll delay={0.8} className="flex justify-center gap-4 mt-8">
+            <motion.button 
               onClick={prevApplication}
               className="p-2 rounded-full bg-antimatter-gray bg-opacity-20 hover:bg-opacity-40 transition-colors"
+              whileHover={{ scale: 1.1, x: -2 }}
+              whileTap={{ scale: 0.9 }}
             >
               <ChevronLeft size={24} />
-            </button>
+            </motion.button>
             
-            <button 
+            <motion.button 
               onClick={nextApplication}
               className="p-2 rounded-full bg-antimatter-gray bg-opacity-20 hover:bg-opacity-40 transition-colors"
+              whileHover={{ scale: 1.1, x: 2 }}
+              whileTap={{ scale: 0.9 }}
             >
               <ChevronRight size={24} />
-            </button>
-          </div>
+            </motion.button>
+          </AnimateOnScroll>
         </div>
       </div>
     </section>

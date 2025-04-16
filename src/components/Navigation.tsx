@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { smoothScrollToElement, handleSmoothScrollLinkClick } from '@/lib/scroll-utils';
 
 interface NavigationLink {
   id: string;
@@ -12,7 +12,9 @@ const links: NavigationLink[] = [
   { id: 'hero', label: 'Home' },
   { id: 'mirror', label: 'Mirror World' },
   { id: 'annihilation', label: 'Annihilation' },
+  { id: 'accelerator', label: 'Accelerator Ring' },
   { id: 'uses', label: 'Applications' },
+  { id: 'physicists', label: 'Pioneers' },
   { id: 'mystery', label: 'Mystery' },
   { id: 'learn', label: 'Learn More' }
 ];
@@ -49,10 +51,19 @@ export default function Navigation() {
   }, []);
   
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    // Prevent default navigation behavior
+    if (typeof window !== 'undefined') {
+      // Force the new scroll position to be calculated from the current scroll position
+      const element = document.getElementById(id);
+      if (element) {
+        // Calculate position for smoother effect
+        smoothScrollToElement(id, { 
+          offset: 80, // Slightly larger offset to account for fixed header
+          highlight: true  
+        });
+      }
     }
+    
     setIsOpen(false);
   };
   
@@ -62,6 +73,7 @@ export default function Navigation() {
       <a 
         href="#hero" 
         className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-antimatter-blue focus:text-white focus:p-4"
+        onClick={(e) => handleSmoothScrollLinkClick(e, 'hero')}
       >
         Skip to content
       </a>
