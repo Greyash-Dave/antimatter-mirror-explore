@@ -1,11 +1,47 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RefreshCw } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Define particle types with their properties
+const particleTypes = {
+  electron: {
+    name: 'Electron',
+    antiName: 'Positron',
+    color: '#1a2b47',
+    antiColor: '#722f37',
+    size: 20,
+    energy: 0.511, // MeV
+  },
+  proton: {
+    name: 'Proton',
+    antiName: 'Antiproton',
+    color: '#1e40af',
+    antiColor: '#991b1b',
+    size: 30,
+    energy: 938.27, // MeV
+  },
+  neutron: {
+    name: 'Neutron',
+    antiName: 'Antineutron',
+    color: '#374151',
+    antiColor: '#4c1d95',
+    size: 30,
+    energy: 939.57, // MeV
+  }
+};
 
 export default function AnnihilationSection() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [energy, setEnergy] = useState(0);
   const [particleCount, setParticleCount] = useState(0);
+  const [selectedParticleType, setSelectedParticleType] = useState('electron');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   
@@ -44,24 +80,26 @@ export default function AnnihilationSection() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    const particleType = particleTypes[selectedParticleType as keyof typeof particleTypes];
+    
     // Draw matter particle on left
     ctx.beginPath();
-    ctx.arc(canvas.width * 0.25, canvas.height / 2, 30, 0, Math.PI * 2);
-    ctx.fillStyle = '#1a2b47'; // Matter Blue
+    ctx.arc(canvas.width * 0.25, canvas.height / 2, particleType.size, 0, Math.PI * 2);
+    ctx.fillStyle = particleType.color;
     ctx.fill();
     
     // Draw antimatter particle on right
     ctx.beginPath();
-    ctx.arc(canvas.width * 0.75, canvas.height / 2, 30, 0, Math.PI * 2);
-    ctx.fillStyle = '#722f37'; // Antimatter Red
+    ctx.arc(canvas.width * 0.75, canvas.height / 2, particleType.size, 0, Math.PI * 2);
+    ctx.fillStyle = particleType.antiColor;
     ctx.fill();
     
     // Draw labels
     ctx.font = '16px "Exo 2", sans-serif';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText('Matter', canvas.width * 0.25, canvas.height / 2 + 60);
-    ctx.fillText('Antimatter', canvas.width * 0.75, canvas.height / 2 + 60);
+    ctx.fillText(particleType.name, canvas.width * 0.25, canvas.height / 2 + 60);
+    ctx.fillText(particleType.antiName, canvas.width * 0.75, canvas.height / 2 + 60);
     
     // Draw arrow indicating they'll meet
     ctx.beginPath();
@@ -93,15 +131,17 @@ export default function AnnihilationSection() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
+    const particleType = particleTypes[selectedParticleType as keyof typeof particleTypes];
+    
     // Create initial matter and antimatter particles
     particles.current = [
       // Matter particle
       {
         x: canvas.width * 0.25,
         y: canvas.height / 2,
-        size: 30,
-        color: '#1a2b47',
-        speedX: 1,
+        size: particleType.size,
+        color: particleType.color,
+        speedX: 1.5,
         speedY: 0,
         type: 'matter',
         life: 100,
@@ -111,9 +151,9 @@ export default function AnnihilationSection() {
       {
         x: canvas.width * 0.75,
         y: canvas.height / 2,
-        size: 30,
-        color: '#722f37',
-        speedX: -1,
+        size: particleType.size,
+        color: particleType.antiColor,
+        speedX: -1.5,
         speedY: 0,
         type: 'antimatter',
         life: 100,
@@ -155,11 +195,13 @@ export default function AnnihilationSection() {
           ctx.fill();
           ctx.globalAlpha = 1;
           
-          // Create energy particles
-          const newEnergyAmount = 100;
+          // Calculate energy based on selected particle type
+          const newEnergyAmount = Math.round(particleType.energy * 2);
           setEnergy(prev => prev + newEnergyAmount);
           
-          for (let i = 0; i < 80; i++) {
+          // Create energy particles
+          const particleNum = 80;
+          for (let i = 0; i < particleNum; i++) {
             const angle = Math.random() * Math.PI * 2;
             const speed = 2 + Math.random() * 3;
             
@@ -176,7 +218,7 @@ export default function AnnihilationSection() {
             });
           }
           
-          setParticleCount(prev => prev + 80);
+          setParticleCount(prev => prev + particleNum);
           
           // Show E=mc² formula
           ctx.font = 'bold 32px "Space Mono", monospace';
@@ -249,6 +291,11 @@ export default function AnnihilationSection() {
       startSimulation();
     }
   };
+
+  const handleParticleChange = (value: string) => {
+    setSelectedParticleType(value);
+    resetSimulation();
+  };
   
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -276,7 +323,7 @@ export default function AnnihilationSection() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [selectedParticleType]);
 
   return (
     <section id="annihilation" className="section bg-gradient-to-r from-antimatter-blue/30 to-antimatter-red/30">
@@ -291,35 +338,53 @@ export default function AnnihilationSection() {
         </p>
         
         <div className="flex-1 flex flex-col bg-black bg-opacity-50 rounded-xl overflow-hidden shadow-xl">
+          <div className="p-4 bg-black bg-opacity-40">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="w-full sm:w-auto">
+                <label className="block text-antimatter-textDim mb-2">Select Particle Pair:</label>
+                <Select value={selectedParticleType} onValueChange={handleParticleChange}>
+                  <SelectTrigger className="w-full sm:w-[200px] bg-black bg-opacity-50 border-antimatter-blue/50">
+                    <SelectValue placeholder="Select particles" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-black border-antimatter-blue/50">
+                    <SelectItem value="electron">Electron / Positron</SelectItem>
+                    <SelectItem value="proton">Proton / Antiproton</SelectItem>
+                    <SelectItem value="neutron">Neutron / Antineutron</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={toggleSimulation}
+                  className="btn-primary flex items-center gap-2"
+                >
+                  {isPlaying ? (
+                    <>
+                      <Pause size={18} /> Pause
+                    </>
+                  ) : (
+                    <>
+                      <Play size={18} /> {energy > 0 ? 'Resume' : 'Start Collision'}
+                    </>
+                  )}
+                </button>
+                
+                <button
+                  onClick={resetSimulation}
+                  className="btn-secondary flex items-center gap-2"
+                >
+                  <RefreshCw size={18} /> Reset
+                </button>
+              </div>
+            </div>
+          </div>
+          
           <div className="flex-1 p-4 relative">
             <canvas 
               ref={canvasRef} 
               className="w-full h-[400px] rounded-lg"
             ></canvas>
-          </div>
-          
-          <div className="p-4 bg-black bg-opacity-40 flex justify-center gap-4">
-            <button
-              onClick={toggleSimulation}
-              className="btn-primary flex items-center gap-2"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause size={18} /> Pause
-                </>
-              ) : (
-                <>
-                  <Play size={18} /> {energy > 0 ? 'Resume' : 'Start Collision'}
-                </>
-              )}
-            </button>
-            
-            <button
-              onClick={resetSimulation}
-              className="btn-secondary flex items-center gap-2"
-            >
-              <RefreshCw size={18} /> Reset
-            </button>
           </div>
         </div>
         
